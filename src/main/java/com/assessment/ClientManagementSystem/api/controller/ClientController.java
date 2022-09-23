@@ -43,6 +43,11 @@ public class ClientController {
     return clientService.getClientById(id);
   }
 
+  @PatchMapping("/{id}")
+  public ClientModel editClient(@PathVariable Integer id, @RequestBody ClientCreateRequest request) throws NotFoundException, InvalidFieldException, DatabaseException {
+    return clientService.editClient(id, request);
+  }
+
   @GetMapping("/search")
   public List<ClientModel> searchForClientsByKey(@RequestParam final String key) {
     var clients = clientService.searchForClientByKey(key);

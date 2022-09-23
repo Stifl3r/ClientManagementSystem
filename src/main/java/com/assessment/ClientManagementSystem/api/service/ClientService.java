@@ -41,6 +41,60 @@ public class ClientService {
     }
   }
 
+
+
+  public List<ClientModel> getAllClients() {
+    var results = clientRepository.findAll();
+    return results.stream()
+        .map(ClientModel::new)
+        .collect(Collectors.toList());
+  }
+
+  public ClientModel getClientById(final Integer id) throws InvalidFieldException, NotFoundException {
+    if (id == null) {
+      throw new InvalidFieldException("Id cannot be null");
+    }
+
+    var client = clientRepository.findById(id)
+        .orElseThrow(()-> new NotFoundException("Provided id does not exist"));
+
+    return new ClientModel(client);
+  }
+
+  public List<ClientModel> searchForClientByKey(final String key) {
+    var results = clientRepository.findByKey(key);
+    return results.stream()
+        .map(ClientModel::new)
+        .collect(Collectors.toList());
+  }
+
+  public ClientModel editClient(final Integer id, final ClientCreateRequest request) throws InvalidFieldException, NotFoundException, DatabaseException {
+    if (id == null) {
+      throw new InvalidFieldException("Id cannot be null");
+    }
+
+    var client = clientRepository.findById(id)
+        .orElseThrow(()-> new NotFoundException("Provided id does not exist"));
+
+    validateClientCreateRequest(request);
+
+    client.setFirstName(request.getFirstName());
+    client.setLastName(request.getLastName());
+    client.setIdNumber(request.getIdNumber());
+    client.setMobileNumber(request.getMobileNumber());
+    client.setPhysicalAddress(request.getPhysicalAddress());
+
+    try {
+      clientRepository.save(client);
+      return new ClientModel(client);
+    } catch (DataIntegrityViolationException dive) {
+      throw new InvalidFieldException("ID number or Mobile number that you have supplied already exists");
+    } catch (Exception e) {
+      throw new DatabaseException("Something went wrong! Please try again later");
+    }
+
+  }
+
   private void validateClientCreateRequest(final ClientCreateRequest request) throws InvalidFieldException {
     if (request.getFirstName() == null || request.getFirstName().isBlank()) {
       throw new InvalidFieldException("Firstname cannot be null or empty");
@@ -69,30 +123,5 @@ public class ClientService {
     if (!request.getMobileNumber().matches("\\d+")) {
       throw new InvalidFieldException("Mobile Number cannot contain alpha numerics");
     }
-  }
-
-  public List<ClientModel> getAllClients() {
-    var results = clientRepository.findAll();
-    return results.stream()
-        .map(ClientModel::new)
-        .collect(Collectors.toList());
-  }
-
-  public ClientModel getClientById(final Integer id) throws InvalidFieldException, NotFoundException {
-    if (id == null) {
-      throw new InvalidFieldException("Id cannot be null");
-    }
-
-    var client = clientRepository.findById(id)
-        .orElseThrow(()-> new NotFoundException("Provided id does not exist"));
-
-    return new ClientModel(client);
-  }
-
-  public List<ClientModel> searchForClientByKey(final String key) {
-    var results = clientRepository.findByKey(key);
-    return results.stream()
-        .map(ClientModel::new)
-        .collect(Collectors.toList());
   }
 }
