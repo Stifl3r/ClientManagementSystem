@@ -2,6 +2,7 @@ package com.assessment.ClientManagementSystem.api.service;
 
 import com.assessment.ClientManagementSystem.api.controller.model.ClientCreateRequest;
 import com.assessment.ClientManagementSystem.api.controller.model.ClientModel;
+import com.assessment.ClientManagementSystem.api.exception.DatabaseException;
 import com.assessment.ClientManagementSystem.api.exception.InvalidFieldException;
 import com.assessment.ClientManagementSystem.api.exception.NotFoundException;
 import com.assessment.ClientManagementSystem.api.repository.ClientRepository;
@@ -371,7 +372,25 @@ public class ClientServiceTest {
     assertEquals("Provided id does not exist", thrown.getMessage());
   }
 
+  @Test
+  public void editClientShouldReturnSuccess() throws NotFoundException, InvalidFieldException, DatabaseException {
+    //Given
+    var client = getDefaultClient();
+    given(clientRepository.findById(client.getClientId()))
+        .willReturn(Optional.of(client));
+    var request = getDefaultClientCreateRequest();
+    var expected = new ClientModel(client);
 
+    //When
+    var actual = clientService.editClient(client.getClientId(), request);
+
+    //Then
+    assertThat(actual)
+        .usingRecursiveComparison()
+        .ignoringActualNullFields()
+        .ignoringExpectedNullFields()
+        .isEqualTo(expected);
+  }
 
   private Client getDefaultClient() {
     var client = new Client();
