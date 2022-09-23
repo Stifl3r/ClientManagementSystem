@@ -2,10 +2,10 @@ package com.assessment.ClientManagementSystem.api.controller;
 
 import com.assessment.ClientManagementSystem.api.controller.model.ClientCreateRequest;
 import com.assessment.ClientManagementSystem.api.controller.model.ClientModel;
+import com.assessment.ClientManagementSystem.api.exception.DatabaseException;
 import com.assessment.ClientManagementSystem.api.exception.InvalidFieldException;
 import com.assessment.ClientManagementSystem.api.exception.NotFoundException;
 import com.assessment.ClientManagementSystem.api.service.ClientService;
-import org.springframework.hateoas.Link;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,7 +25,7 @@ public class ClientController {
   }
 
   @PostMapping
-  public ResponseEntity<ClientModel> createClient(@RequestBody final ClientCreateRequest request) throws InvalidFieldException {
+  public ResponseEntity<ClientModel> createClient(@RequestBody final ClientCreateRequest request) throws InvalidFieldException, DatabaseException {
     var result = clientService.createClient(request);
     return ResponseEntity
         .status(CREATED)

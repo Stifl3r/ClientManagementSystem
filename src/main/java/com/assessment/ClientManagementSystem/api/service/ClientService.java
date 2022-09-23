@@ -2,10 +2,12 @@ package com.assessment.ClientManagementSystem.api.service;
 
 import com.assessment.ClientManagementSystem.api.controller.model.ClientCreateRequest;
 import com.assessment.ClientManagementSystem.api.controller.model.ClientModel;
+import com.assessment.ClientManagementSystem.api.exception.DatabaseException;
 import com.assessment.ClientManagementSystem.api.exception.InvalidFieldException;
 import com.assessment.ClientManagementSystem.api.exception.NotFoundException;
 import com.assessment.ClientManagementSystem.api.repository.ClientRepository;
 import com.assessment.ClientManagementSystem.api.repository.entity.Client;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -20,7 +22,7 @@ public class ClientService {
     this.clientRepository = clientRepository;
   }
 
-  public ClientModel createClient(final ClientCreateRequest request) throws InvalidFieldException {
+  public ClientModel createClient(final ClientCreateRequest request) throws InvalidFieldException, DatabaseException {
     validateClientCreateRequest(request);
     var client = new Client();
     client.setFirstName(request.getFirstName());
@@ -29,8 +31,14 @@ public class ClientService {
     client.setMobileNumber(request.getMobileNumber());
     client.setPhysicalAddress(request.getPhysicalAddress());
 
-    clientRepository.save(client);
-    return new ClientModel(client);
+    try {
+      clientRepository.save(client);
+      return new ClientModel(client);
+    } catch (DataIntegrityViolationException dive) {
+      throw new InvalidFieldException("ID number or Mobile number that you have supplied already exists");
+    } catch (Exception e) {
+      throw new DatabaseException("Something went wrong! Please try again later");
+    }
   }
 
   private void validateClientCreateRequest(final ClientCreateRequest request) throws InvalidFieldException {
