@@ -196,6 +196,183 @@ public class ClientServiceTest {
     assertEquals("ID Number length should be 13", thrown.getMessage());
   }
 
+  @Test
+  public void editClientWhenFirstnameIsNullShouldReturnInvalidField() {
+    //Given
+    var request = getDefaultClientCreateRequest();
+    request.setFirstName(null);
+
+    var client = getDefaultClient();
+    given(clientRepository.findById(client.getClientId()))
+        .willReturn(Optional.of(client));
+
+    //When
+    var thrown = catchThrowable(() -> clientService.editClient(1, request));
+
+    //Then
+    assertThat(thrown).isInstanceOf(InvalidFieldException.class);
+    assertEquals("Firstname cannot be null or empty", thrown.getMessage());
+  }
+
+  @Test
+  public void editClientWhenFirstnameIsEmptyShouldReturnInvalidField() {
+    //Given
+    var request = getDefaultClientCreateRequest();
+    request.setFirstName(" ");
+
+    var client = getDefaultClient();
+    given(clientRepository.findById(client.getClientId()))
+        .willReturn(Optional.of(client));
+
+    //When
+    var thrown = catchThrowable(() -> clientService.editClient(1, request));
+
+    //Then
+    assertThat(thrown).isInstanceOf(InvalidFieldException.class);
+    assertEquals("Firstname cannot be null or empty", thrown.getMessage());
+  }
+
+  @Test
+  public void editClientWhenLastnameIsNullShouldReturnInvalidField() {
+    //Given
+    var request = getDefaultClientCreateRequest();
+    request.setLastName(null);
+
+    var client = getDefaultClient();
+    given(clientRepository.findById(client.getClientId()))
+        .willReturn(Optional.of(client));
+
+    //When
+    var thrown = catchThrowable(() -> clientService.editClient(1, request));
+
+    //Then
+    assertThat(thrown).isInstanceOf(InvalidFieldException.class);
+    assertEquals("Lastname cannot be null or empty", thrown.getMessage());
+  }
+
+  @Test
+  public void editClientWhenLastnameIsEmptyShouldReturnInvalidField() {
+    //Given
+    var request = getDefaultClientCreateRequest();
+    request.setLastName(" ");
+
+    var client = getDefaultClient();
+    given(clientRepository.findById(client.getClientId()))
+        .willReturn(Optional.of(client));
+
+    //When
+    var thrown = catchThrowable(() -> clientService.editClient(1, request));
+
+    //Then
+    assertThat(thrown).isInstanceOf(InvalidFieldException.class);
+    assertEquals("Lastname cannot be null or empty", thrown.getMessage());
+  }
+
+  @Test
+  public void editClientWhenIdNumberIsNullShouldReturnInvalidField() {
+    //Given
+    var request = getDefaultClientCreateRequest();
+    request.setIdNumber(null);
+
+    var client = getDefaultClient();
+    given(clientRepository.findById(client.getClientId()))
+        .willReturn(Optional.of(client));
+
+    //When
+    var thrown = catchThrowable(() -> clientService.editClient(1, request));
+
+    //Then
+    assertThat(thrown).isInstanceOf(InvalidFieldException.class);
+    assertEquals("ID Number cannot be null or empty", thrown.getMessage());
+  }
+
+  @Test
+  public void editClientWhenIdNumberIsEmptyShouldReturnInvalidField() {
+    //Given
+    var request = getDefaultClientCreateRequest();
+    request.setIdNumber(" ");
+
+    var client = getDefaultClient();
+    given(clientRepository.findById(client.getClientId()))
+        .willReturn(Optional.of(client));
+
+    //When
+    var thrown = catchThrowable(() -> clientService.editClient(1, request));
+
+    //Then
+    assertThat(thrown).isInstanceOf(InvalidFieldException.class);
+    assertEquals("ID Number cannot be null or empty", thrown.getMessage());
+  }
+
+  @Test
+  public void editClientWhenIdNumberIsNonNumericShouldReturnInvalidField() {
+    //Given
+    var request = getDefaultClientCreateRequest();
+    request.setIdNumber("111111111111A");
+
+    var client = getDefaultClient();
+    given(clientRepository.findById(client.getClientId()))
+        .willReturn(Optional.of(client));
+
+    //When
+    var thrown = catchThrowable(() -> clientService.editClient(1, request));
+
+    //Then
+    assertThat(thrown).isInstanceOf(InvalidFieldException.class);
+    assertEquals("ID Number cannot contain alpha numerics", thrown.getMessage());
+  }
+
+  @Test
+  public void editClientWhenIdNumberLengthIsInvalidShouldReturnInvalidField() {
+    //Given
+    var request = getDefaultClientCreateRequest();
+    request.setIdNumber("111111111111");
+
+    var client = getDefaultClient();
+    given(clientRepository.findById(client.getClientId()))
+        .willReturn(Optional.of(client));
+
+    //When
+    var thrown = catchThrowable(() -> clientService.editClient(1, request));
+
+    //Then
+    assertThat(thrown).isInstanceOf(InvalidFieldException.class);
+    assertEquals("ID Number length should be 13", thrown.getMessage());
+  }
+
+  @Test
+  public void editClientWhenIdIsNullShouldReturnInvalidField() {
+    //Given
+    var request = getDefaultClientCreateRequest();
+
+    //When
+    var thrown = catchThrowable(()-> clientService.editClient(null, request));
+
+    //Then
+    assertThat(thrown).isInstanceOf(InvalidFieldException.class);
+    assertEquals("Id cannot be null", thrown.getMessage());
+  }
+
+  @Test
+  public void editClientWhenIdDoesNotExistShouldReturnNotFound() {
+    //Given
+    var request = getDefaultClientCreateRequest();
+    var client = getDefaultClient();
+    given(clientRepository.findById(client.getClientId()))
+        .willReturn(Optional.of(client));
+
+    //When
+    var thrown = catchThrowable(() ->
+        clientService.editClient(999, request)
+    );
+
+    //Then
+    assertThat(thrown).isInstanceOf(NotFoundException.class);
+    assertEquals("Provided id does not exist", thrown.getMessage());
+  }
+
+
+
   private Client getDefaultClient() {
     var client = new Client();
     client.setClientId(1);
