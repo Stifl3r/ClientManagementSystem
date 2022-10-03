@@ -198,6 +198,66 @@ public class ClientServiceTest {
   }
 
   @Test
+  public void createClientWhenMobileNumberIsNullShouldReturnInvalidField() {
+    //Given
+    var request = getDefaultClientCreateRequest();
+    request.setMobileNumber(null);
+
+    //When
+    var thrown = catchThrowable(() -> clientService.createClient(request));
+
+    //Then
+    assertThat(thrown).isInstanceOf(InvalidFieldException.class);
+    assertEquals("Mobile Number cannot be null or empty", thrown.getMessage());
+  }
+
+  @Test
+  public void createClientWhenMobileNumberIsEmptyShouldReturnInvalidField() {
+    //Given
+    var request = getDefaultClientCreateRequest();
+    request.setMobileNumber(" ");
+
+    //When
+    var thrown = catchThrowable(() -> clientService.createClient(request));
+
+    //Then
+    assertThat(thrown).isInstanceOf(InvalidFieldException.class);
+    assertEquals("Mobile Number cannot be null or empty", thrown.getMessage());
+  }
+
+  @Test
+  public void createClientWhenMobileNumberIsNonNumericShouldReturnInvalidField() {
+    //Given
+    var request = getDefaultClientCreateRequest();
+    request.setMobileNumber("0000000A");
+
+    //When
+    var thrown = catchThrowable(() -> clientService.createClient(request));
+
+    //Then
+    assertThat(thrown).isInstanceOf(InvalidFieldException.class);
+    assertEquals("Mobile Number cannot contain alpha numerics", thrown.getMessage());
+  }
+
+  @Test
+  public void createClientShouldReturnSuccess() throws InvalidFieldException, DatabaseException {
+    //Given
+    var client = getDefaultClient();
+    var request = getDefaultClientCreateRequest();
+    var expected = new ClientModel(client);
+
+    //When
+    var actual = clientService.createClient( request);
+
+    //Then
+    assertThat(actual)
+        .usingRecursiveComparison()
+        .ignoringActualNullFields()
+        .ignoringExpectedNullFields()
+        .isEqualTo(expected);
+  }
+
+  @Test
   public void editClientWhenFirstnameIsNullShouldReturnInvalidField() {
     //Given
     var request = getDefaultClientCreateRequest();
