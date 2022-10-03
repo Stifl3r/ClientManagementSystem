@@ -308,6 +308,25 @@ public class ClientServiceTest {
         .isEqualTo(expected);
   }
 
+  @Test
+  public void searchForClientsShouldReturnListOfClients() {
+    //Given
+    var client = getDefaultClient();
+    var expected = of(new ClientModel(client));
+
+    given(clientRepository.findByKey("key"))
+        .willReturn(of(client));
+
+    //When
+    var actual = clientService.searchForClientByKey("key");
+
+    //Then
+    assertEquals(expected.size(), actual.size());
+    assertThat(actual.get(0))
+        .usingRecursiveComparison()
+        .isEqualTo(expected.get(0));
+
+  }
   private Client getDefaultClient() {
     var client = new Client();
     client.setClientId(1);
